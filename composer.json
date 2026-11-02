@@ -1,0 +1,32 @@
+{
+    "name": "charlesstolive/filament-front-localization",
+    "description": "Les textes du front modifiables depuis le B.O. Filament : les fichiers de langue restent la référence, seules les modifications vont en base",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "filament",
+        "localization",
+        "translations"
+    ],
+    "require": {
+        "php": "^8.3",
+        "filament/filament": "^5.0",
+        "illuminate/support": "^12.0|^13.0",
+        "illuminate/translation": "^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CharlesStOlive\\FilamentFrontLocalization\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CharlesStOlive\\FilamentFrontLocalization\\FilamentFrontLocalizationServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
