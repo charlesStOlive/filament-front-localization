@@ -135,31 +135,48 @@ class FrontTexts
      *
      * @throws ValidationException
      */
-    public function save(string $groupId, string $key, array $values, ?int $userId = null): void
+    public function save(string $groupId, string $key, array $values, ?int $userId = null, string $reason = TextOverrides::REASON_EDIT): void
     {
-        [$group, $definition] = $this->resolve($groupId, $key);
-        $errors = [];
-        $clean = [];
+        [$group] = $this->resolve($groupId, $key);
 
-        foreach ($this->locales() as $locale => $name) {
-            if (! array_key_exists($locale, $values)) {
-                continue;
-            }
-
-            $value = is_string($values[$locale]) ? trim($values[$locale]) : null;
-
-            if ($value !== null && $value !== '' && ($error = $this->validate($definition, $this->reference($group, $key, $locale), $value))) {
-                $errors["values.{$locale}"] = $error;
-            }
-
-            $clean[$locale] = $value === '' ? null : $value;
-        }
-
-        if ($errors !== []) {
+        if ($errors = $this->errors($groupId, $key, $values)) {
             throw ValidationException::withMessages($errors);
         }
 
-        $this->overrides->put($group->namespace, $group->group, $key, $clean, $userId);
+        $clean = [];
+
+        foreach (array_keys($this->locales()) as $locale) {
+            if (array_key_exists($locale, $values)) {
+                $value = is_string($values[$locale]) ? trim($values[$locale]) : null;
+                $clean[$locale] = $value === '' ? null : $value;
+            }
+        }
+
+        $this->overrides->put($group->namespace, $group->group, $key, $clean, $userId, $reason);
+    }
+
+    /**
+     * Ce qui ne va pas dans des textes, langue par langue (`values.fr` => message), sans rien enregistrer.
+     *
+     * @param  array<string, ?string>  $values
+     * @return array<string, string>
+     *
+     * @throws ValidationException si la clé n'est pas au catalogue
+     */
+    public function errors(string $groupId, string $key, array $values): array
+    {
+        [$group, $definition] = $this->resolve($groupId, $key);
+        $errors = [];
+
+        foreach (array_keys($this->locales()) as $locale) {
+            $value = is_string($values[$locale] ?? null) ? trim($values[$locale]) : '';
+
+            if ($value !== '' && ($error = $this->validate($definition, $this->reference($group, $key, $locale), $value))) {
+                $errors["values.{$locale}"] = $error;
+            }
+        }
+
+        return $errors;
     }
 
     /** Rend toutes les langues d'une clé du catalogue au texte d'origine. */

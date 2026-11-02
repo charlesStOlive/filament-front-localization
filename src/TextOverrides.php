@@ -74,15 +74,28 @@ class TextOverrides
         return $this->group($namespace, $group)[$key] ?? [];
     }
 
+    public const REASON_EDIT = 'edit';
+
+    public const REASON_RESET = 'reset';
+
+    /** Le texte est passé dans le fichier (front-texts:write). */
+    public const REASON_WRITTEN = 'written';
+
+    /** Le fichier avait déjà ce texte (front-texts:prune, après un déploiement). */
+    public const REASON_PRUNED = 'pruned';
+
+    /** Le texte vient d'un export d'un autre environnement (front-texts:import). */
+    public const REASON_IMPORTED = 'imported';
+
     /**
      * Pose les textes d'une clé, langue par langue : une valeur null ou vide rend la langue au fichier. Chaque langue qui
-     * change entre au journal. Les valeurs doivent déjà être validées (FrontTexts::save()).
+     * change entre au journal, avec sa raison. Les valeurs doivent déjà être validées (FrontTexts::save()).
      *
      * @param  array<string, ?string>  $values  langue => texte
      */
-    public function put(string $namespace, string $group, string $key, array $values, ?int $userId = null): void
+    public function put(string $namespace, string $group, string $key, array $values, ?int $userId = null, string $reason = self::REASON_EDIT): void
     {
-        DB::transaction(function () use ($namespace, $group, $key, $values, $userId): void {
+        DB::transaction(function () use ($namespace, $group, $key, $values, $userId, $reason): void {
             $override = FrontTextOverride::query()
                 ->where(['namespace' => $namespace, 'group' => $group, 'key' => $key])
                 ->lockForUpdate()
@@ -108,6 +121,7 @@ class TextOverrides
                         'locale' => $locale,
                         'old_value' => $before[$locale] ?? null,
                         'new_value' => $after[$locale] ?? null,
+                        'reason' => $reason,
                         'user_id' => $userId,
                         'created_at' => now(),
                     ]);
@@ -135,7 +149,7 @@ class TextOverrides
     /** Rend toutes les langues d'une clé au fichier. */
     public function forget(string $namespace, string $group, string $key, ?int $userId = null): void
     {
-        $this->put($namespace, $group, $key, array_fill_keys(array_keys($this->values($namespace, $group, $key)), null), $userId);
+        $this->put($namespace, $group, $key, array_fill_keys(array_keys($this->values($namespace, $group, $key)), null), $userId, self::REASON_RESET);
     }
 
     /**

@@ -34,6 +34,8 @@ return new class extends Migration
             // null : la valeur du fichier (pas de surcharge).
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();
+            // edit (modifié), reset (texte d'origine rétabli), written (écrit dans le fichier), pruned (déjà dans le fichier).
+            $table->string('reason', 20)->default('edit');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamp('created_at')->nullable();
 

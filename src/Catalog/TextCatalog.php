@@ -37,6 +37,30 @@ class TextCatalog
         return $this->group($namespace, $group)?->definition($key);
     }
 
+    /**
+     * Les groupes choisis par les commandes : identifiants, jokers permis (`des/*`), et `lang` (fichiers de langue) ou
+     * `config` (groupes `config:`). Sans motif : tous.
+     *
+     * @param  array<int, string>  $patterns
+     * @return array<int, TextGroup>
+     */
+    public function select(array $patterns = [], ?string $only = null): array
+    {
+        return array_values(array_filter($this->groups(), function (TextGroup $group) use ($patterns, $only): bool {
+            if (($only === 'config' && ! $group->fromConfig()) || ($only === 'lang' && $group->fromConfig())) {
+                return false;
+            }
+
+            foreach ($patterns as $pattern) {
+                if (fnmatch($pattern, $group->id())) {
+                    return true;
+                }
+            }
+
+            return $patterns === [];
+        }));
+    }
+
     /** Après un changement de config (tests) : le catalogue se relit. */
     public function flush(): void
     {

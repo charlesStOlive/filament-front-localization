@@ -3,7 +3,12 @@
 namespace CharlesStOlive\FilamentFrontLocalization;
 
 use CharlesStOlive\FilamentFrontLocalization\Catalog\TextCatalog;
+use CharlesStOlive\FilamentFrontLocalization\Console\ExportFrontTextsCommand;
+use CharlesStOlive\FilamentFrontLocalization\Console\ImportFrontTextsCommand;
+use CharlesStOlive\FilamentFrontLocalization\Console\PruneFrontTextsCommand;
+use CharlesStOlive\FilamentFrontLocalization\Console\WriteFrontTextsCommand;
 use CharlesStOlive\FilamentFrontLocalization\Translation\OverridingLoader;
+use CharlesStOlive\FilamentFrontLocalization\Writing\FrontTextsWriter;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +21,12 @@ class FilamentFrontLocalizationServiceProvider extends ServiceProvider
         $this->app->singleton(TextCatalog::class);
         $this->app->singleton(TextOverrides::class);
         $this->app->singleton(FrontTexts::class);
+        $this->app->bind(FrontTextsWriter::class, fn ($app): FrontTextsWriter => new FrontTextsWriter(
+            $app->make(TextCatalog::class),
+            $app->make(TextOverrides::class),
+            $app->langPath(),
+            $app->configPath(),
+        ));
 
         // Le chargeur de Laravel garde ses chemins et ses namespaces ; il reçoit en plus les textes modifiés des groupes
         // du catalogue. Le traducteur, lui, reste celui de Laravel.
@@ -31,6 +42,13 @@ class FilamentFrontLocalizationServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'filament-front-localization');
 
         if ($this->app->runningInConsole()) {
+            $this->commands([
+                ExportFrontTextsCommand::class,
+                ImportFrontTextsCommand::class,
+                WriteFrontTextsCommand::class,
+                PruneFrontTextsCommand::class,
+            ]);
+
             $this->publishes([
                 __DIR__.'/../config/filament-front-localization.php' => config_path('filament-front-localization.php'),
             ], 'filament-front-localization-config');

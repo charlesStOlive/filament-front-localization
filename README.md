@@ -75,6 +75,40 @@ $text = app(FrontTexts::class)->override('mail-access/sponsors-des-access', 'mes
 Un worker de file d'attente garde les traductions qu'il a déjà chargées : `queue:restart` après une modification si des
 courriels en file utilisent ces textes par `__()`.
 
+## Reporter les textes dans le code
+
+Les textes modifiés dans le B.O. peuvent devenir les textes d'origine : ils remplacent la valeur dans le fichier de langue
+(ou dans la config, pour un groupe `config:`), à sa place exacte (commentaires, mise en forme, espaces insécables et
+appels comme `env()` restent tels quels), puis sortent de la base.
+
+Les textes sont corrigés en production, les fichiers vivent dans git. Le circuit :
+
+```bash
+# 1. En production : les textes modifiés, en JSON
+php artisan front-texts:export                      # storage/app/front-texts/front-texts-AAAA-MM-JJ-HHMM.json
+php artisan front-texts:export - > textes.json      # ou sur la sortie standard (ssh …)
+
+# 2. En dev : les importer (chacun est revalidé contre les fichiers d'ici), puis les écrire
+php artisan front-texts:import textes.json [--replace] [--dry-run]
+php artisan front-texts:write --dry-run
+php artisan front-texts:write                       # puis relire git diff lang config, committer, déployer
+
+# 3. En production, après le déploiement : retirer de la base ce que les fichiers portent désormais
+php artisan front-texts:prune [--dry-run]
+```
+
+Chaque commande accepte `--group=` (jokers : `--group='des/*'`, `--group='mail-access/*'`) et `--only=lang|config`.
+`front-texts:write --keep` écrit sans vider la base. `front-texts:import --replace` fait reprendre exactement le fichier
+aux groupes importés (les textes de dev absents du fichier sont retirés).
+
+**Interdites en production** : `front-texts:write` (les fichiers écrits seraient écrasés au prochain déploiement, et les
+textes retirés de la base perdus) et `front-texts:import` (il écraserait les textes des rédacteurs). `prune` ne retire
+jamais un texte que le fichier n'a pas : un texte modifié depuis l'export reste.
+
+Non écrits (la base les garde, la commande le dit) : un texte de plugin (son fichier est dans le plugin), une clé absente
+du fichier de cette langue, une valeur qui n'y est pas une chaîne simple. L'historique de l'écran note la raison de
+chaque changement : modifié, texte d'origine rétabli, importé, écrit dans le fichier, déjà dans le fichier.
+
 ## Tests
 
-Ils vivent dans l'application hôte : desapp, `tests/Feature/Localization/FrontTextsTest.php`.
+Ils vivent dans l'application hôte : desapp, `tests/Feature/Localization/FrontTextsTest.php`, `FrontTextsWriteTest.php` et `FrontTextsTransferTest.php`.

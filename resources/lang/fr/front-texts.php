@@ -37,6 +37,13 @@ return [
         'original' => '(texte d’origine)',
         'unknown_user' => 'Inconnu',
         'line' => ':date — :user — :locale',
+        'reasons' => [
+            'edit' => 'modifié',
+            'reset' => 'texte d’origine rétabli',
+            'written' => 'écrit dans le fichier',
+            'pruned' => 'déjà dans le fichier',
+            'imported' => 'importé',
+        ],
     ],
     'validation' => [
         'not_editable' => 'Ce texte n’est pas modifiable.',

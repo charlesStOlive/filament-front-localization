@@ -8,6 +8,9 @@
                     'user' => $change->user?->name ?? __('filament-front-localization::front-texts.history.unknown_user'),
                     'locale' => $locales[$change->locale] ?? $change->locale,
                 ]) }}
+                @if ($change->reason !== 'edit')
+                    — {{ __('filament-front-localization::front-texts.history.reasons.'.$change->reason) }}
+                @endif
             </p>
             <p class="mt-1 text-gray-500 line-through dark:text-gray-400">
                 {{ $change->old_value ?? __('filament-front-localization::front-texts.history.original') }}
