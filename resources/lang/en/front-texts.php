@@ -53,4 +53,8 @@ return [
         'no_html' => 'The text cannot contain HTML tags.',
         'html_tags' => 'Only these tags are allowed: :tags.',
     ],
+    'localized' => [
+        'switcher' => 'Content language',
+        'reset_hint' => 'Clear every language: the original text comes back when you save.',
+    ],
 ];

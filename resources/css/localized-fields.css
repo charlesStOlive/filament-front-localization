@@ -1,0 +1,42 @@
+/* filament-front-localization : les pastilles de langue des champs par langue (Forms\Localized, Section::localized()).
+   Couleurs des variables de Filament (et donc de filament-ui). */
+
+.ffl-locale-switcher { display: inline-flex; align-items: center; gap: 0.25rem; }
+
+.ffl-locale-badge,
+.ffl-locale-marker {
+    display: inline-flex; align-items: center; gap: 0.125rem;
+    padding: 0.1875rem 0.4375rem; border-radius: 0.375rem;
+    font-size: 0.6875rem; font-weight: 600; line-height: 1; letter-spacing: 0.04em;
+    border: 1px solid var(--gray-300); color: var(--gray-600); background: transparent;
+}
+.dark .ffl-locale-badge, .dark .ffl-locale-marker { border-color: var(--gray-600); color: var(--gray-300); }
+
+.ffl-locale-badge { cursor: pointer; transition: background-color 120ms, border-color 120ms, color 120ms; }
+.ffl-locale-badge:hover { border-color: var(--primary-500); color: var(--primary-600); }
+.dark .ffl-locale-badge:hover { color: var(--primary-400); }
+.ffl-locale-badge:focus-visible { outline: 2px solid var(--primary-500); outline-offset: 1px; }
+
+/* La langue affichée. */
+.ffl-locale-badge.ffl-active,
+.dark .ffl-locale-badge.ffl-active { background: var(--primary-600); border-color: var(--primary-600); color: #fff; }
+
+/* Une langue vide : le front reprendra la langue de référence. */
+.ffl-locale-badge.ffl-empty { border-style: dashed; color: var(--gray-400); }
+.ffl-locale-badge.ffl-empty.ffl-active,
+.dark .ffl-locale-badge.ffl-empty.ffl-active {
+    background: color-mix(in oklab, var(--primary-500) 14%, transparent);
+    border-color: var(--primary-500); color: var(--primary-700);
+}
+.dark .ffl-locale-badge.ffl-empty.ffl-active { color: var(--primary-300); }
+
+/* Une erreur de validation dans cette langue. */
+.ffl-locale-badge.ffl-has-error, .ffl-locale-marker.ffl-has-error,
+.dark .ffl-locale-badge.ffl-has-error, .dark .ffl-locale-marker.ffl-has-error { border-color: var(--danger-500); color: var(--danger-600); border-style: solid; }
+.ffl-locale-badge.ffl-has-error.ffl-active,
+.dark .ffl-locale-badge.ffl-has-error.ffl-active { background: var(--danger-600); border-color: var(--danger-600); color: #fff; }
+.ffl-locale-badge-error { font-weight: 700; }
+
+/* La langue d'une saisie dans une section qui choisit la langue : une étiquette, pas un bouton. */
+.ffl-locale-marker { background: var(--gray-100); border-color: transparent; color: var(--gray-500); }
+.dark .ffl-locale-marker { background: var(--gray-800); border-color: transparent; color: var(--gray-400); }

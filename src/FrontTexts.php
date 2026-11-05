@@ -37,6 +37,24 @@ class FrontTexts
         return is_array($front) && $front !== [] ? $front : [App::getLocale() => App::getLocale()];
     }
 
+    /**
+     * La langue de référence des champs par langue (Forms\Localized) : celle qui s'ouvre d'abord, que le front reprend
+     * quand une autre est vide. `filament-front-localization.default_locale`, sinon celle du front
+     * (livewire-localization.default), sinon la première langue éditée.
+     */
+    public function defaultLocale(): string
+    {
+        $codes = array_map('strval', array_keys($this->locales()));
+
+        foreach ([config('filament-front-localization.default_locale'), config('livewire-localization.default')] as $wanted) {
+            if (is_string($wanted) && in_array($wanted, $codes, true)) {
+                return $wanted;
+            }
+        }
+
+        return $codes[0];
+    }
+
     public function catalog(): TextCatalog
     {
         return $this->catalog;

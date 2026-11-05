@@ -53,4 +53,8 @@ return [
         'no_html' => 'Le texte ne peut pas contenir de balises HTML.',
         'html_tags' => 'Seules ces balises sont permises : :tags.',
     ],
+    'localized' => [
+        'switcher' => 'Langue du contenu',
+        'reset_hint' => 'Vider toutes les langues : le texte d’origine reviendra à l’enregistrement.',
+    ],
 ];

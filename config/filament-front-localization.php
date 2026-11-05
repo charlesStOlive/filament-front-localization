@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | La langue de référence des champs par langue
+    |--------------------------------------------------------------------------
+    |
+    | Forms\Localized : la langue ouverte d'abord, celle que requiredDefault()
+    | exige et que le front reprend quand une autre est vide. null : celle du
+    | front (livewire-localization.default), sinon la première de `locales`.
+    |
+    */
+    'default_locale' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Le catalogue des textes modifiables
     |--------------------------------------------------------------------------
     |
